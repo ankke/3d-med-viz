@@ -25,7 +25,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.vl.addWidget(self.vtkWidget)
 
         self.createMenu()
-        # self.createStatusBar()
 
         self.displayIsoRender()
 
@@ -61,12 +60,6 @@ class MainWindow(QtWidgets.QMainWindow):
         path = '../data/mr_brainixA'
         reader, image_data = read_dicom_images(path)
 
-        win_width = 750
-        win_center = 100
-
-        max_value = 1
-        min_value = 0
-        point = 180
 
         self.contour_filter = vtk_utils.contour_filter(image_data, 150)
         actor = vtk_actor(poly_data_mapper(self.contour_filter))
@@ -96,13 +89,6 @@ class MainWindow(QtWidgets.QMainWindow):
     def displayTransferFun(self):
         path = '../data/mr_brainixA'
         reader, image_data = read_dicom_images(path)
-
-        nFrames = image_data.GetDimensions()[2]
-        winWidth = 750
-        winCenter = 100
-
-        # --- filter: apply winWidth and winCenter
-        shiftScaleFilter = shift_scale_filter(reader, winCenter, winWidth)
 
         self.point = 180
 
