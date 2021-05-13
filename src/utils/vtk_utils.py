@@ -44,9 +44,9 @@ def piecewise_fun(point_vals):
     return piecewise
 
 
-def poly_data_mapper(contour_filter, transfer_function=transfer_fun()):
+def poly_data_mapper(contour_filter_, transfer_function=transfer_fun()):
     mapper = vtk.vtkPolyDataMapper()
-    mapper.SetInputConnection(contour_filter.GetOutputPort())
+    mapper.SetInputConnection(contour_filter_.GetOutputPort())
     mapper.SetLookupTable(transfer_function)
     return mapper
 
@@ -72,7 +72,7 @@ def volume_actor(mapper, piecewise, transfer_function=transfer_fun()):
     return actor
 
 
-def renderer(actor, background):
+def get_renderer(actor, background):
     renderer_ = vtk.vtkRenderer()
     renderer_.AddActor(actor)
     renderer_.SetBackground(background)
@@ -86,7 +86,7 @@ def window_renderer(renderer_, height, width):
     return win_renderer
 
 
-def interactor(win_renderer):
+def get_interactor(win_renderer):
     inter = vtk.vtkRenderWindowInteractor()
     inter.SetRenderWindow(win_renderer)
     return inter
