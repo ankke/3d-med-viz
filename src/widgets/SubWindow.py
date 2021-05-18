@@ -55,12 +55,14 @@ class SubWindow(QWidget):
             self.checkbox.setCheckable(False)
         else:
             self.checkbox.setCheckable(True)
+
         self.action = actions.get(value)(measurement_on=self.checkbox.isChecked())
         self.vtkWidget.GetRenderWindow().AddRenderer(self.action.renderer)
         self.iren = self.vtkWidget.GetRenderWindow().GetInteractor()
         self.action.init_action(self.iren)
-        self.refresh_tool_bar()
         self.action.renderer.ResetCamera()
+
+        self.refresh_tool_bar()
 
     def on_checkbox_change(self):
         if self.checkbox.isChecked():
