@@ -1,49 +1,44 @@
 import sys
 
-from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QToolBar, QStatusBar
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QToolBar, QStatusBar, QHBoxLayout, QMainWindow, QFrame, QApplication, QLabel, QGridLayout, \
+    QComboBox
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 
 from actions.iso_render import IsoAction
-from actions.measurement_2_action import MeasurementAction2
 from actions.measurement_action import MeasurementAction
 from actions.transfer_fun_render import TransferFunAction
+from widgets.SubWindow import SubWindow
 
 
-class MainWindow(QtWidgets.QMainWindow):
+class MainWindow(QMainWindow):
 
     def __init__(self, parent=None):
-        QtWidgets.QMainWindow.__init__(self, parent)
+        QMainWindow.__init__(self, parent)
 
-        self.frame = QtWidgets.QFrame()
+        self.frame = QFrame()
 
-        self.vl = QtWidgets.QVBoxLayout()
-        self.vtkWidget = QVTKRenderWindowInteractor(self.frame)
-        self.vl.addWidget(self.vtkWidget)
+        self.layout = QGridLayout()
+        self.vtk_widgets = [SubWindow(), SubWindow(),
+                            SubWindow(), SubWindow()]
+        positions = [(i, j) for i in range(2) for j in range(2)]
+        for position, widget in zip(positions, self.vtk_widgets):
+            self.layout.addWidget(widget, *position)
 
-        self.create_menu()
-        self.action = None
-        self.display_measurement()
-
-        self.action.renderer.ResetCamera()
-
-        self.frame.setLayout(self.vl)
+        self.frame.setLayout(self.layout)
         self.setCentralWidget(self.frame)
 
-        self.iren.Initialize()
-
-    def create_menu(self):
-        menu = self.menuBar().addMenu("&Menu")
-        menu.addAction("&Iso", self.display_iso_render)
-        menu.addAction("&Transfer fun", self.display_transfer_fun)
-        menu.addAction("&Measurement", self.display_measurement)
-        menu.addAction("&Measurement 2", self.display_measurement_2)
+    # def create_menu(self):
+    #     menu = self.menuBar().addMenu("&Menu")
+    #     menu.addAction("&Iso", self.display_iso_render)
+    #     menu.addAction("&Transfer fun", self.display_transfer_fun)
+    #     menu.addAction("&Measurement", self.display_measurement)
 
 
-    def create_status_bar(self):
-        status = QStatusBar()
-        status.showMessage("")
-        self.setStatusBar(status)
+    # def create_status_bar(self):
+    #     status = QStatusBar()
+    #     status.showMessage("")
+    #     self.setStatusBar(status)
 
     def display_iso_render(self):
         self.action = IsoAction()
@@ -57,23 +52,16 @@ class MainWindow(QtWidgets.QMainWindow):
         self.action = MeasurementAction()
         self.restart_window()
 
-    def display_measurement_2(self):
-        self.action = MeasurementAction2()
-        self.restart_window()
-
     def restart_window(self):
         self.vtkWidget.GetRenderWindow().AddRenderer(self.action.renderer)
         self.iren = self.vtkWidget.GetRenderWindow().GetInteractor()
         self.action.init_action(self.iren)
         self.remove_tool_bar()
         self.action.renderer.ResetCamera()
-        self.frame.setLayout(self.vl)
-        self.setCentralWidget(self.frame)
 
     def restart_window_with_slider(self):
         self.restart_window()
-        self.slider = self.action.slider
-        self.create_tool_bar(self.slider)
+        self.create_tool_bar(self.action.slider, self.action.label)
 
     def remove_tool_bar(self):
         try:
@@ -81,15 +69,17 @@ class MainWindow(QtWidgets.QMainWindow):
         except:
             pass
 
-    def create_tool_bar(self, slider):
+    def create_tool_bar(self, slider, label):
         tools = QToolBar()
+        tools.setMinimumWidth(250)
+        tools.addWidget(label)
         tools.addWidget(slider)
-        self.addToolBar(tools)
+        self.addToolBar(Qt.LeftToolBarArea, tools)
         self.toolBar = tools
 
 
 if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
+    app = QApplication(sys.argv)
 
     window = MainWindow()
     window.setWindowTitle("VTK 3D App")

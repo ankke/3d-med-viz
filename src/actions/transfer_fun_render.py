@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QSlider
+from PyQt5.QtWidgets import QSlider, QLabel
 from PyQt5.QtCore import Qt
 
 from utils.vtk_utils import volume_mapper, piecewise_fun, volume_actor, read_dicom_images, window_renderer, \
@@ -20,6 +20,7 @@ class TransferFunAction(object):
         self.win_renderer = window_renderer(self.renderer, 800, 600)
         self.iren = None
         self.slider = None
+        self.label = None
 
     def init_action(self, iren):
         self.iren = iren
@@ -31,8 +32,14 @@ class TransferFunAction(object):
         slider.setMinimum(0)
         slider.setMaximum(100)
         slider.setValue(50)
-        slider.valueChanged.connect(lambda x: self.change_transfer_fun())
+        slider.setMinimumHeight(40)
+        slider.sliderReleased.connect(self.change_transfer_fun)
         self.slider = slider
+        label = QLabel()
+        label.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+        label.setText('Transfer function')
+        label.setMinimumHeight(30)
+        self.label = label
 
     def change_transfer_fun(self):
         value = self.slider.value()

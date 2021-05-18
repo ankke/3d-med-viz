@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QSlider
+from PyQt5.QtWidgets import QSlider, QLabel
 from PyQt5.QtCore import Qt
 
 from utils.vtk_utils import *
@@ -12,9 +12,9 @@ class IsoAction(object):
         actor = vtk_actor(poly_data_mapper(self.contour_filter))
 
         self.renderer = get_renderer(actor, background=(.8, .8, .8))
-        self.win_renderer = window_renderer(self.renderer, 800, 600)
         self.iren = None
         self.slider = None
+        self.label = None
 
     def init_action(self, iren):
         self.iren = iren
@@ -26,8 +26,14 @@ class IsoAction(object):
         slider.setMinimum(0)
         slider.setMaximum(255)
         slider.setValue(128)
-        slider.valueChanged.connect(lambda x: self.change_iso_value())
+        slider.setMinimumHeight(40)
+        slider.sliderReleased.connect(self.change_iso_value)
         self.slider = slider
+        label = QLabel()
+        label.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+        label.setText('ISO')
+        label.setMinimumHeight(30)
+        self.label = label
 
     def change_iso_value(self):
         value = self.slider.value()
