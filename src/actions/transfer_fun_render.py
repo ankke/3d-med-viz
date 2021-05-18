@@ -8,7 +8,7 @@ from utils.vtk_utils import volume_mapper, piecewise_fun, volume_actor, read_dic
 
 class TransferFunAction(object):
 
-    def __init__(self, path='../data/mr_brainixA'):
+    def __init__(self, measurement_on=False, path='../data/mr_brainixA'):
         reader, image_data = read_dicom_images(path)
 
         self.point = 180
@@ -23,6 +23,7 @@ class TransferFunAction(object):
         self.slider = None
         self.label = None
         self.meas_widget = None
+        self.measurement_on = measurement_on
 
     def init_action(self, iren):
         self.iren = iren
@@ -35,6 +36,8 @@ class TransferFunAction(object):
         self.meas_widget.SetInteractor(self.iren)
         self.meas_widget.CreateDefaultRepresentation()
         self.meas_widget.SetRepresentation(vtk.vtkDistanceRepresentation3D())
+        if self.measurement_on:
+            self.meas_widget.On()
 
     def init_slider(self):
         slider = QSlider(Qt.Horizontal)

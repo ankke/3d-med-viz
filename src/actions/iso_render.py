@@ -5,7 +5,7 @@ from utils.vtk_utils import *
 
 
 class IsoAction(object):
-    def __init__(self, path='../data/mr_brainixA'):
+    def __init__(self, measurement_on=False, path='../data/mr_brainixA'):
         _, image_data = read_dicom_images(path)
 
         self.contour_filter = contour_filter(image_data, 150)
@@ -15,6 +15,7 @@ class IsoAction(object):
         self.iren = None
         self.slider = None
         self.label = None
+        self.measurement_on = measurement_on
 
     def init_action(self, iren):
         self.iren = iren
@@ -27,6 +28,8 @@ class IsoAction(object):
         self.meas_widget.SetInteractor(self.iren)
         self.meas_widget.CreateDefaultRepresentation()
         self.meas_widget.SetRepresentation(vtk.vtkDistanceRepresentation3D())
+        if self.measurement_on:
+            self.meas_widget.On()
 
     def init_slider(self):
         slider = QSlider(Qt.Horizontal)
