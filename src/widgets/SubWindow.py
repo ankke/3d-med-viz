@@ -13,6 +13,7 @@ class SubWindow(QWidget):
 
         layout = QVBoxLayout()
         combo = QComboBox()
+        combo.addItem('')
         combo.addItem('iso')
         combo.addItem('transfer')
         combo.currentTextChanged.connect(self.on_combobox_changed)
@@ -24,6 +25,8 @@ class SubWindow(QWidget):
         layout.addWidget(combo)
         layout.addWidget(self.vtkWidget)
         self.setLayout(layout)
+
+        self.iren.Initialize()
 
     def on_combobox_changed(self, value):
         if value == 'iso':
