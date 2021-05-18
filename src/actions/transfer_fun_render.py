@@ -1,3 +1,4 @@
+import vtk
 from PyQt5.QtWidgets import QSlider, QLabel
 from PyQt5.QtCore import Qt
 
@@ -21,11 +22,19 @@ class TransferFunAction(object):
         self.iren = None
         self.slider = None
         self.label = None
+        self.meas_widget = None
 
     def init_action(self, iren):
         self.iren = iren
         add_style(self.iren)
+        self.init_measurement()
         self.init_slider()
+
+    def init_measurement(self):
+        self.meas_widget = vtk.vtkDistanceWidget()
+        self.meas_widget.SetInteractor(self.iren)
+        self.meas_widget.CreateDefaultRepresentation()
+        self.meas_widget.SetRepresentation(vtk.vtkDistanceRepresentation3D())
 
     def init_slider(self):
         slider = QSlider(Qt.Horizontal)
@@ -52,3 +61,4 @@ class TransferFunAction(object):
         self.piecewise.AddPoint(self.point, value / 100)
         self.piecewise.AddPoint(self.point + 1, value / 100)
         self.piecewise.AddPoint(255, 0)
+

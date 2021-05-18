@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QComboBox, QWidget, QVBoxLayout
+from PyQt5.QtWidgets import QComboBox, QWidget, QVBoxLayout, QCheckBox, QHBoxLayout
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 
 from actions.iso_render import IsoAction
@@ -11,18 +11,25 @@ class SubWindow(QWidget):
     def __init__(self, *args, **kwargs):
         super(SubWindow, self).__init__(*args, **kwargs)
 
-        layout = QVBoxLayout()
         combo = QComboBox()
         combo.addItem('')
         for name in actions.keys():
             combo.addItem(name)
         combo.currentTextChanged.connect(self.on_combobox_changed)
-        self.combo = combo
+
         self.action = None
         self.vtkWidget = QVTKRenderWindowInteractor()
         self.iren = self.vtkWidget.GetRenderWindow().GetInteractor()
+        checkbox = QCheckBox("measurement")
+        checkbox.setChecked(False)
+        checkbox.toggled.connect(lambda: self.on_checkbox_change(checkbox))
 
-        layout.addWidget(combo)
+        inner_layout = QHBoxLayout()
+        inner_layout.addWidget(combo)
+        inner_layout.addWidget(checkbox)
+
+        layout = QVBoxLayout()
+        layout.addLayout(inner_layout)
         layout.addWidget(self.vtkWidget)
         self.setLayout(layout)
 
@@ -34,3 +41,9 @@ class SubWindow(QWidget):
         self.iren = self.vtkWidget.GetRenderWindow().GetInteractor()
         self.action.init_action(self.iren)
         self.action.renderer.ResetCamera()
+
+    def on_checkbox_change(self, box):
+        if box.isChecked():
+            self.action.meas_widget.On()
+        else:
+            self.action.meas_widget.Off()

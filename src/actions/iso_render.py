@@ -19,7 +19,14 @@ class IsoAction(object):
     def init_action(self, iren):
         self.iren = iren
         add_style(self.iren)
+        self.init_measurement()
         self.init_slider()
+
+    def init_measurement(self):
+        self.meas_widget = vtk.vtkDistanceWidget()
+        self.meas_widget.SetInteractor(self.iren)
+        self.meas_widget.CreateDefaultRepresentation()
+        self.meas_widget.SetRepresentation(vtk.vtkDistanceRepresentation3D())
 
     def init_slider(self):
         slider = QSlider(Qt.Horizontal)

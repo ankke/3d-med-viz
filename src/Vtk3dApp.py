@@ -1,13 +1,7 @@
 import sys
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QToolBar, QStatusBar, QHBoxLayout, QMainWindow, QFrame, QApplication, QLabel, QGridLayout, \
-    QComboBox
-from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
+from PyQt5.QtWidgets import QMainWindow, QFrame, QApplication, QGridLayout
 
-from actions.iso_render import IsoAction
-from actions.measurement_action import MeasurementAction
-from actions.transfer_fun_render import TransferFunAction
 from widgets.SubWindow import SubWindow
 
 
@@ -40,42 +34,19 @@ class MainWindow(QMainWindow):
     #     status.showMessage("")
     #     self.setStatusBar(status)
 
-    def display_iso_render(self):
-        self.action = IsoAction()
-        self.restart_window_with_slider()
-
-    def display_transfer_fun(self):
-        self.action = TransferFunAction()
-        self.restart_window_with_slider()
-
-    def display_measurement(self):
-        self.action = MeasurementAction()
-        self.restart_window()
-
-    def restart_window(self):
-        self.vtkWidget.GetRenderWindow().AddRenderer(self.action.renderer)
-        self.iren = self.vtkWidget.GetRenderWindow().GetInteractor()
-        self.action.init_action(self.iren)
-        self.remove_tool_bar()
-        self.action.renderer.ResetCamera()
-
-    def restart_window_with_slider(self):
-        self.restart_window()
-        self.create_tool_bar(self.action.slider, self.action.label)
-
-    def remove_tool_bar(self):
-        try:
-            self.removeToolBar(self.toolBar)
-        except:
-            pass
-
-    def create_tool_bar(self, slider, label):
-        tools = QToolBar()
-        tools.setMinimumWidth(250)
-        tools.addWidget(label)
-        tools.addWidget(slider)
-        self.addToolBar(Qt.LeftToolBarArea, tools)
-        self.toolBar = tools
+    # def remove_tool_bar(self):
+    #     try:
+    #         self.removeToolBar(self.toolBar)
+    #     except:
+    #         pass
+    #
+    # def create_tool_bar(self, slider, label):
+    #     tools = QToolBar()
+    #     tools.setMinimumWidth(250)
+    #     tools.addWidget(label)
+    #     tools.addWidget(slider)
+    #     self.addToolBar(Qt.LeftToolBarArea, tools)
+    #     self.toolBar = tools
 
 
 if __name__ == "__main__":
