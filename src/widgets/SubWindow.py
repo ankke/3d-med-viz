@@ -1,10 +1,10 @@
-from PyQt5.QtWidgets import QComboBox, QHBoxLayout, QWidget, QVBoxLayout
+from PyQt5.QtWidgets import QComboBox, QWidget, QVBoxLayout
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 
 from actions.iso_render import IsoAction
 from actions.transfer_fun_render import TransferFunAction
 
-actions = [IsoAction(), TransferFunAction()]
+actions = {'iso': IsoAction, 'transfer': TransferFunAction}
 
 
 class SubWindow(QWidget):
@@ -14,8 +14,8 @@ class SubWindow(QWidget):
         layout = QVBoxLayout()
         combo = QComboBox()
         combo.addItem('')
-        combo.addItem('iso')
-        combo.addItem('transfer')
+        for name in actions.keys():
+            combo.addItem(name)
         combo.currentTextChanged.connect(self.on_combobox_changed)
         self.combo = combo
         self.action = None
@@ -29,12 +29,7 @@ class SubWindow(QWidget):
         self.iren.Initialize()
 
     def on_combobox_changed(self, value):
-        if value == 'iso':
-            print('iso')
-            self.action = IsoAction()
-        if value == 'transfer':
-            print('transfer')
-            self.action = TransferFunAction()
+        self.action = actions.get(value)()
         self.vtkWidget.GetRenderWindow().AddRenderer(self.action.renderer)
         self.iren = self.vtkWidget.GetRenderWindow().GetInteractor()
         self.action.init_action(self.iren)
