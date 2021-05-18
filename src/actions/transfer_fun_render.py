@@ -21,7 +21,7 @@ class TransferFunAction(object):
         self.win_renderer = window_renderer(self.renderer, 800, 600)
         self.iren = None
         self.slider = None
-        self.label = None
+        self.widgets = []
         self.meas_widget = None
         self.measurement_on = measurement_on
 
@@ -40,6 +40,12 @@ class TransferFunAction(object):
             self.meas_widget.On()
 
     def init_slider(self):
+        label = QLabel()
+        label.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+        label.setText('Transfer function')
+        label.setMinimumHeight(30)
+        self.widgets.append(label)
+
         slider = QSlider(Qt.Horizontal)
         slider.setMinimum(0)
         slider.setMaximum(100)
@@ -47,11 +53,8 @@ class TransferFunAction(object):
         slider.setMinimumHeight(40)
         slider.sliderReleased.connect(self.change_transfer_fun)
         self.slider = slider
-        label = QLabel()
-        label.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
-        label.setText('Transfer function')
-        label.setMinimumHeight(30)
-        self.label = label
+        self.widgets.append(slider)
+
 
     def change_transfer_fun(self):
         value = self.slider.value()

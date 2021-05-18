@@ -13,8 +13,9 @@ class IsoAction(object):
 
         self.renderer = get_renderer(actor, background=(.8, .8, .8))
         self.iren = None
+        self.widgets = []
         self.slider = None
-        self.label = None
+        self.meas_widget = None
         self.measurement_on = measurement_on
 
     def init_action(self, iren):
@@ -32,6 +33,12 @@ class IsoAction(object):
             self.meas_widget.On()
 
     def init_slider(self):
+        label = QLabel()
+        label.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+        label.setText('ISO')
+        label.setMinimumHeight(30)
+        self.widgets.append(label)
+
         slider = QSlider(Qt.Horizontal)
         slider.setMinimum(0)
         slider.setMaximum(255)
@@ -39,11 +46,8 @@ class IsoAction(object):
         slider.setMinimumHeight(40)
         slider.sliderReleased.connect(self.change_iso_value)
         self.slider = slider
-        label = QLabel()
-        label.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
-        label.setText('ISO')
-        label.setMinimumHeight(30)
-        self.label = label
+        self.widgets.append(slider)
+
 
     def change_iso_value(self):
         value = self.slider.value()
