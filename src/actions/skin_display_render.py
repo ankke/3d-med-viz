@@ -1,11 +1,15 @@
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QLabel, QSlider
+
 from utils.vtk_utils import *
 
 
 class SkinDisplayAction(object):
-    def __init__(self, path='../data/mr_brainixA'):
+    def __init__(self, measurement_on=False, path='../data/mr_brainixA'):
         reader, image_data = read_dicom_images(path)
 
         self.iren = None
+        self.widgets = []
         self.slider = None
         self.label = None
         self.meas_widget = None
@@ -48,12 +52,29 @@ class SkinDisplayAction(object):
         self.iren = iren
         add_style(self.iren)
         self.init_measurement()
+        self.init_slider()
 
     def init_measurement(self):
         self.meas_widget = vtk.vtkDistanceWidget()
         self.meas_widget.SetInteractor(self.iren)
         self.meas_widget.CreateDefaultRepresentation()
         self.meas_widget.SetRepresentation(vtk.vtkDistanceRepresentation3D())
+
+    def init_slider(self):
+        label = QLabel()
+        label.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+        label.setText('Translucent skin - ISO')
+        label.setMinimumHeight(30)
+        self.widgets.append(label)
+
+        slider = QSlider(Qt.Horizontal)
+        slider.setMinimum(0)
+        slider.setMaximum(800)
+        slider.setValue(400)
+        slider.setMinimumHeight(40)
+        slider.sliderReleased.connect(self.change_value)
+        self.slider = slider
+        self.widgets.append(slider)
 
     def init_skin_tools(self, reader):
         self.init_skin_extractor(reader)
@@ -214,3 +235,7 @@ class SkinDisplayAction(object):
         self.coronal.SetDisplayExtent(0, 255, 128, 128, 0, 92)
         self.coronal.ForceOpaqueOn()
 
+    def change_value(self):
+        value = self.slider.value()
+        self.skin_extractor.SetValue(0, value)
+        self.skin_extractor.Update()

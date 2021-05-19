@@ -1,5 +1,5 @@
-from PyQt5.QtWidgets import QSlider, QLabel
 from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QSlider, QLabel
 
 from utils.vtk_utils import *
 
@@ -47,7 +47,6 @@ class IsoAction(object):
         slider.sliderReleased.connect(self.change_iso_value)
         self.slider = slider
         self.widgets.append(slider)
-
 
     def change_iso_value(self):
         value = self.slider.value()

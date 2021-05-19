@@ -4,9 +4,11 @@ from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 
 from actions.iso_render import IsoAction
 from actions.transfer_fun_render import TransferFunAction
+from actions.skin_display_render import SkinDisplayAction
 from widgets.ToolBar import ToolBar
 
-actions = {'iso': IsoAction, 'transfer': TransferFunAction}
+
+actions = {'iso': IsoAction, 'transfer': TransferFunAction, 'skin': SkinDisplayAction}
 
 
 class SubWindow(QWidget):
