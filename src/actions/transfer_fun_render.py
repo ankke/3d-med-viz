@@ -18,7 +18,6 @@ class TransferFunAction(object):
         self.actor = volume_actor(self.mapper, self.piecewise)
 
         self.renderer = get_renderer(self.actor, background=(0.8, 0.8, 0.8))
-        self.win_renderer = window_renderer(self.renderer, 800, 600)
         self.iren = None
         self.slider = None
         self.widgets = []
