@@ -78,6 +78,12 @@ def get_renderer(actor, background):
     renderer_.SetBackground(background)
     return renderer_
 
+def get_renderer_with_multiple_actors(actor_list, background):
+    renderer_ = vtk.vtkRenderer()
+    for actor in actor_list:
+        renderer_.AddActor(actor)
+    renderer_.SetBackground(background)
+    return renderer_
 
 def window_renderer(renderer_, height, width):
     win_renderer = vtk.vtkRenderWindow()

@@ -1,74 +1,67 @@
 import sys
 
-from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QToolBar, QStatusBar
-from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QMainWindow, QFrame, QApplication, QGridLayout, QToolBar
 
-from actions.iso_render import IsoAction
-from actions.transfer_fun_render import TransferFunAction
+from widgets.SubWindow import SubWindow
 
 
-class MainWindow(QtWidgets.QMainWindow):
+class MainWindow(QMainWindow):
 
     def __init__(self, parent=None):
-        QtWidgets.QMainWindow.__init__(self, parent)
+        QMainWindow.__init__(self, parent)
 
-        self.frame = QtWidgets.QFrame()
+        self.frame = QFrame()
+        self.layout = QGridLayout()
 
-        self.vl = QtWidgets.QVBoxLayout()
-        self.vtkWidget = QVTKRenderWindowInteractor(self.frame)
-        self.vl.addWidget(self.vtkWidget)
+        self.vtk_widgets = [SubWindow(self, i + 1) for i in range(4)]
+        positions = [(i, j) for i in range(2) for j in range(2)]
+        for position, widget in zip(positions, self.vtk_widgets):
+            self.layout.addWidget(widget, *position)
 
-        self.create_menu()
-        self.action = None
-        self.display_iso_render()
+        self.frame.setLayout(self.layout)
+        self.toolBar = self.create_tool_bar()
+        self.addToolBar(Qt.LeftToolBarArea, self.toolBar)
 
-        self.action.renderer.ResetCamera()
-
-        self.frame.setLayout(self.vl)
         self.setCentralWidget(self.frame)
 
-        self.iren.Initialize()
 
-    def create_menu(self):
-        menu = self.menuBar().addMenu("&Menu")
-        menu.addAction("&Iso", self.display_iso_render)
-        menu.addAction("&Transfer fun", self.display_transfer_fun)
 
-    def create_status_bar(self):
-        status = QStatusBar()
-        status.showMessage("")
-        self.setStatusBar(status)
+    # def create_menu(self):
+    #     menu = self.menuBar().addMenu("&Menu")
+    #     menu.addAction("&Iso", self.display_iso_render)
+    #     menu.addAction("&Transfer fun", self.display_transfer_fun)
+    #     menu.addAction("&Measurement", self.display_measurement)
 
-    def display_iso_render(self):
-        self.action = IsoAction()
-        self.restart_window_with_slider()
 
-    def display_transfer_fun(self):
-        self.action = TransferFunAction()
-        self.restart_window_with_slider()
+    # def create_status_bar(self):
+    #     status = QStatusBar()
+    #     status.showMessage("")
+    #     self.setStatusBar(status)
 
-    def restart_window_with_slider(self):
-        self.vtkWidget.GetRenderWindow().AddRenderer(self.action.renderer)
-        self.iren = self.vtkWidget.GetRenderWindow().GetInteractor()
-        self.action.init_action(self.iren)
-        self.slider = self.action.slider
-        self.create_tool_bar(self.slider)
 
-    def create_tool_bar(self, slider):
+    def create_tool_bar(self):
+        self.remove_tool_bar()
+        tools = QToolBar()
+        tools.setMinimumWidth(250)
+        for vtk_widgets in self.vtk_widgets:
+            for widget in vtk_widgets.tool_bar.widgets:
+                tools.addWidget(widget)
+        return tools
+
+    def refresh_tool_bar(self):
+        self.remove_tool_bar()
+        self.toolBar = self.create_tool_bar()
+        self.addToolBar(Qt.LeftToolBarArea, self.toolBar)
+
+    def remove_tool_bar(self):
         try:
             self.removeToolBar(self.toolBar)
         except:
             pass
 
-        tools = QToolBar()
-        tools.addWidget(slider)
-        self.addToolBar(tools)
-        self.toolBar = tools
-
-
 if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
+    app = QApplication(sys.argv)
 
     window = MainWindow()
     window.setWindowTitle("VTK 3D App")
