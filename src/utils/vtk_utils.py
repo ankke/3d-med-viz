@@ -125,3 +125,20 @@ def add_style(inter):
 def start_render(inter):
     inter.Initialize()
     inter.Start()
+
+
+def synchronize(vtkWidget, irens):
+    vtkWidget.tag = vtkWidget.vtk_widget.AddObserver("InteractionEvent",
+                                                     lambda obj, event: sync_render(obj, event, irens))
+
+
+def unsynchronize(vtkWidget):
+    vtkWidget.vtk_widget.RemoveObserver(vtkWidget.tag)
+
+
+def sync_render(obj, _event, irens):
+    camera = obj.GetRenderWindow().GetRenderers().GetFirstRenderer().GetActiveCamera()
+    for i in irens:
+        i.GetRenderWindow().GetRenderers().GetFirstRenderer().SetActiveCamera(camera)
+    for i in irens:
+        i.Render()
