@@ -20,6 +20,5 @@ class ToolBar(QWidget):
         self.widgets = []
 
     def set_up_action(self, action):
-        self.widgets = [self.label]
+        self.widgets = [self.line, self.label]
         self.widgets.extend(action.widgets)
-        self.widgets.append(self.line)
