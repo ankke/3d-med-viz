@@ -1,7 +1,7 @@
 import sys
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QMainWindow, QFrame, QApplication, QGridLayout, QToolBar
+from PyQt5.QtWidgets import QMainWindow, QFrame, QApplication, QGridLayout, QToolBar, QPushButton, QFileDialog, QSlider
 
 from widgets.SubWindow import SubWindow
 
@@ -13,41 +13,44 @@ class MainWindow(QMainWindow):
 
         self.frame = QFrame()
         self.layout = QGridLayout()
+        self.vtk_widgets = []
+        self.toolBar = None
+        self.init_subwindows('../data/mr_brainixA')
 
-        self.vtk_widgets = [SubWindow(self, i + 1) for i in range(4)]
+    def init_subwindows(self, folderpath):
+        self.vtk_widgets = [SubWindow(self, i + 1, path=folderpath) for i in range(4)]
         positions = [(i, j) for i in range(2) for j in range(2)]
         for position, widget in zip(positions, self.vtk_widgets):
             self.layout.addWidget(widget, *position)
-
         self.frame.setLayout(self.layout)
         self.toolBar = self.create_tool_bar()
         self.addToolBar(Qt.LeftToolBarArea, self.toolBar)
 
         self.setCentralWidget(self.frame)
 
-
-
-    # def create_menu(self):
-    #     menu = self.menuBar().addMenu("&Menu")
-    #     menu.addAction("&Iso", self.display_iso_render)
-    #     menu.addAction("&Transfer fun", self.display_transfer_fun)
-    #     menu.addAction("&Measurement", self.display_measurement)
-
-
-    # def create_status_bar(self):
-    #     status = QStatusBar()
-    #     status.showMessage("")
-    #     self.setStatusBar(status)
-
-
     def create_tool_bar(self):
         self.remove_tool_bar()
         tools = QToolBar()
         tools.setMinimumWidth(250)
+        button = QPushButton("&Load other data")
+        button.clicked.connect(self.open_file_dialog)
+        tools.addWidget(button)
         for vtk_widgets in self.vtk_widgets:
             for widget in vtk_widgets.tool_bar.widgets:
                 tools.addWidget(widget)
         return tools
+
+    def open_file_dialog(self):
+        dir_path = QFileDialog.getExistingDirectory(self, 'Select Folder')
+        if dir_path != '':
+            self.re_init_subwindows(dir_path)
+        else:
+            pass
+
+    def re_init_subwindows(self, dir_path):
+        for window in self.vtk_widgets:
+            window.close()
+        self.init_subwindows(dir_path)
 
     def refresh_tool_bar(self):
         self.remove_tool_bar()
