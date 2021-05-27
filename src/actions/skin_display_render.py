@@ -1,3 +1,5 @@
+import os
+
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QLabel, QSlider
 
@@ -6,8 +8,9 @@ from utils.vtk_utils import *
 
 class SkinDisplayAction(object):
     def __init__(self, measurement_on=False, path='../data/mr_brainixA'):
+        _, _, files = next(os.walk(path))
+        self.image_amount = len(files)
         reader, image_data = read_dicom_images(path)
-
         self.iren = None
         self.widgets = []
         self.slider = None
@@ -193,11 +196,11 @@ class SkinDisplayAction(object):
 
     def init_colors(self, reader):
         self.init_sagittal_colors(reader)
-        self.init_sagittal()
+        self.init_sagittal(reader)
         self.init_axial_colors(reader)
-        self.init_axial()
+        self.init_axial(reader)
         self.init_coronal_colors(reader)
-        self.init_coronal()
+        self.init_coronal(reader)
 
     def init_sagittal_colors(self, reader):
         self.sagittal_colors = vtk.vtkImageMapToColors()
@@ -205,10 +208,11 @@ class SkinDisplayAction(object):
         self.sagittal_colors.SetLookupTable(self.bw_lut)
         self.sagittal_colors.Update()
 
-    def init_sagittal(self):
+    #Sagittal, mają być w połowie szerokości - empirycznie testowane
+    def init_sagittal(self, reader):
         self.sagittal = vtk.vtkImageActor()
         self.sagittal.GetMapper().SetInputConnection(self.sagittal_colors.GetOutputPort())
-        self.sagittal.SetDisplayExtent(128, 128, 0, 255, 0, 92)
+        self.sagittal.SetDisplayExtent(int(reader.GetWidth()/2), int(reader.GetWidth()/2), 0, reader.GetHeight(), 0, self.image_amount)
         self.sagittal.ForceOpaqueOn()
 
     def init_axial_colors(self, reader):
@@ -217,10 +221,10 @@ class SkinDisplayAction(object):
         self.axial_colors.SetLookupTable(self.hue_lut)
         self.axial_colors.Update()
 
-    def init_axial(self):
+    def init_axial(self, reader):
         self.axial = vtk.vtkImageActor()
         self.axial.GetMapper().SetInputConnection(self.axial_colors.GetOutputPort())
-        self.axial.SetDisplayExtent(0, 255, 0, 255, 46, 46)
+        self.axial.SetDisplayExtent(0, reader.GetWidth(), 0, reader.GetHeight(), int(self.image_amount/2), int(self.image_amount/2))
         self.axial.ForceOpaqueOn()
 
     def init_coronal_colors(self, reader):
@@ -229,10 +233,11 @@ class SkinDisplayAction(object):
         self.coronal_colors.SetLookupTable(self.sat_lut)
         self.coronal_colors.Update()
 
-    def init_coronal(self):
+    #Coronal to białe, mają być w połowie wysokości - empirycznie testowane
+    def init_coronal(self, reader):
         self.coronal = vtk.vtkImageActor()
         self.coronal.GetMapper().SetInputConnection(self.coronal_colors.GetOutputPort())
-        self.coronal.SetDisplayExtent(0, 255, 128, 128, 0, 92)
+        self.coronal.SetDisplayExtent(0, reader.GetHeight(), int(reader.GetHeight()/2), int(reader.GetHeight()/2), 0, self.image_amount)
         self.coronal.ForceOpaqueOn()
 
     def change_value(self):

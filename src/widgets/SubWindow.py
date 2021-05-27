@@ -3,18 +3,20 @@ from PyQt5.QtWidgets import QComboBox, QWidget, QVBoxLayout, QCheckBox, QHBoxLay
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 
 from actions.iso_render import IsoAction
+from actions.skin_cover_render import SkinCoverAction
 from actions.transfer_fun_render import TransferFunAction
 from actions.skin_display_render import SkinDisplayAction
 from widgets.ToolBar import ToolBar
 
 
-actions = {'iso': IsoAction, 'transfer': TransferFunAction, 'skin': SkinDisplayAction}
+actions = {'iso': IsoAction, 'transfer': TransferFunAction, 'translucentSkin': SkinDisplayAction, 'skin':SkinCoverAction}
 
 
 class SubWindow(QWidget):
-    def __init__(self, parent, name, *args, **kwargs):
+    def __init__(self, parent, name, path='../data/mr_brainixA', *args, **kwargs):
         super(SubWindow, self).__init__(*args, **kwargs)
         self.parent = parent
+        self.path = path
 
         label_text = f'Window {name}'
         self.tool_bar = ToolBar(label_text)
@@ -58,7 +60,7 @@ class SubWindow(QWidget):
         else:
             self.checkbox.setCheckable(True)
 
-        self.action = actions.get(value)(measurement_on=self.checkbox.isChecked())
+        self.action = actions.get(value)(measurement_on=self.checkbox.isChecked(), path=self.path)
         self.vtkWidget.GetRenderWindow().AddRenderer(self.action.renderer)
         self.iren = self.vtkWidget.GetRenderWindow().GetInteractor()
         self.action.init_action(self.iren)
