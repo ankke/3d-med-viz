@@ -6,10 +6,14 @@ from actions.iso_render import IsoAction
 from actions.skin_cover_render import SkinCoverAction
 from actions.transfer_fun_render import TransferFunAction
 from actions.skin_display_render import SkinDisplayAction
+from actions.transfer_mult_point import TransferFunMultAction
 from widgets.ToolBar import ToolBar
 
-
-actions = {'iso': IsoAction, 'transfer': TransferFunAction, 'translucentSkin': SkinDisplayAction, 'skin':SkinCoverAction}
+actions = {'iso': IsoAction,
+           'transfer': TransferFunMultAction,
+           'transfer one point': TransferFunAction,
+           'translucent skin': SkinDisplayAction,
+           'skin': SkinCoverAction}
 
 
 class SubWindow(QWidget):
@@ -80,6 +84,3 @@ class SubWindow(QWidget):
     def refresh_tool_bar(self):
         self.tool_bar.set_up_action(self.action)
         self.parent.refresh_tool_bar()
-
-
-

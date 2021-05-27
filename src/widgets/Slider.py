@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QWidget, QHBoxLayout, QSlider, QLabel
 
 class Slider(QWidget):
 
-    def __init__(self, min, max, init, callback, scale=1.0):
+    def __init__(self, min, max, init, callback, scale=1.0, input=None):
         super().__init__()
         self.scale = scale
         slider = QSlider(Qt.Horizontal, self)
@@ -22,6 +22,9 @@ class Slider(QWidget):
         self.label = label
 
         hbox = QHBoxLayout()
+        if input is not None:
+            hbox.addWidget(input)
+            hbox.addSpacing(10)
         hbox.addWidget(self.slider)
         hbox.addSpacing(15)
         hbox.addWidget(self.label)
