@@ -3,6 +3,7 @@ import sys
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow, QFrame, QGridLayout, QToolBar, QCheckBox, QPushButton, QFileDialog, \
     QApplication
+
 from utils.vtk_utils import synchronize, unsynchronize
 from widgets.SubWindow import SubWindow
 
@@ -16,10 +17,10 @@ class MainWindow(QMainWindow):
         self.layout = QGridLayout()
         self.vtk_widgets = []
         self.toolBar = None
-        self.init_subwindows('../data/mr_brainixA')
+        self.init_subwindows()
 
-    def init_subwindows(self, folderpath):
-        self.vtk_widgets = [SubWindow(self, i + 1, path=folderpath) for i in range(4)]
+    def init_subwindows(self, dir_path=None):
+        self.vtk_widgets = [SubWindow(self, i + 1, path=dir_path) for i in range(4)]
         positions = [(i, j) for i in range(2) for j in range(2)]
         for position, widget in zip(positions, self.vtk_widgets):
             self.layout.addWidget(widget, *position)
@@ -34,12 +35,13 @@ class MainWindow(QMainWindow):
         tools = QToolBar()
         tools.setMinimumWidth(250)
 
-        button = QPushButton("&Load other data")
+        button = QPushButton("&Load data")
         button.clicked.connect(self.open_file_dialog)
         tools.addWidget(button)
 
         checkbox = QCheckBox("Synchronize windows")
-        checkbox.setMinimumHeight(40)
+        checkbox.setMinimumHeight(30)
+        checkbox.setStyleSheet("margin-left:50%; margin-right:50%;")
         checkbox.toggled.connect(self.on_checkbox_change(checkbox))
         tools.addWidget(checkbox)
 

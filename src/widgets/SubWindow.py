@@ -13,7 +13,7 @@ actions = {'iso': IsoAction, 'transfer': TransferFunAction, 'translucentSkin': S
 
 
 class SubWindow(QWidget):
-    def __init__(self, parent, name, path='../data/mr_brainixA', *args, **kwargs):
+    def __init__(self, parent, name, path=None, *args, **kwargs):
         super(SubWindow, self).__init__(*args, **kwargs)
         self.parent = parent
         self.path = path
@@ -27,6 +27,8 @@ class SubWindow(QWidget):
 
         combo = QComboBox()
         combo.addItem('')
+        if path is None:
+            combo.setEnabled(False)
         for name in actions.keys():
             combo.addItem(name)
         combo.currentTextChanged.connect(self.on_combobox_changed)
