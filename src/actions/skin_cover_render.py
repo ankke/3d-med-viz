@@ -1,8 +1,9 @@
 import vtk
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QSlider, QLabel
+from PyQt5.QtWidgets import QLabel
 
 from utils.vtk_utils import read_dicom_images, add_style, get_renderer_with_multiple_actors
+from widgets.Slider import Slider
 
 
 class SkinCoverAction(object):
@@ -44,14 +45,8 @@ class SkinCoverAction(object):
         label.setMinimumHeight(30)
         self.widgets.append(label)
 
-        slider = QSlider(Qt.Horizontal)
-        slider.setMinimum(0)
-        slider.setMaximum(1000)
-        slider.setValue(500)
-        slider.setMinimumHeight(40)
-        slider.sliderReleased.connect(self.change_value)
-        self.slider = slider
-        self.widgets.append(slider)
+        self.slider = Slider(0, 1000, 500, self.change_value)
+        self.widgets.append(self.slider)
 
     def init_skin_extractor(self, reader):
         try:
@@ -89,8 +84,9 @@ class SkinCoverAction(object):
         self.outline_actor.SetMapper(self.map_outline)
         self.outline_actor.GetProperty().SetColor(self.colors.GetColor3d('Black'))
 
-    def change_value(self):
-        value = self.slider.value()
+    def change_value(self, value):
         self.skin_extractor.SetValue(0, value)
         self.skin_extractor.Update()
+        self.iren.GetRenderWindow().Render()
+
 

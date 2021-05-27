@@ -1,7 +1,8 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QSlider, QLabel
+from PyQt5.QtWidgets import QLabel
 
 from utils.vtk_utils import *
+from widgets.Slider import Slider
 
 
 class IsoAction(object):
@@ -39,16 +40,9 @@ class IsoAction(object):
         label.setMinimumHeight(30)
         self.widgets.append(label)
 
-        slider = QSlider(Qt.Horizontal)
-        slider.setMinimum(0)
-        slider.setMaximum(255)
-        slider.setValue(128)
-        slider.setMinimumHeight(40)
-        slider.sliderReleased.connect(self.change_iso_value)
-        self.slider = slider
-        self.widgets.append(slider)
+        self.slider = Slider(0, 155, 128, self.change_iso_value)
+        self.widgets.append(self.slider)
 
-    def change_iso_value(self):
-        value = self.slider.value()
+    def change_iso_value(self, value):
         self.contour_filter.SetValue(0, value)
         self.iren.GetRenderWindow().Render()

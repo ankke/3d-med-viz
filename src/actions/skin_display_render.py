@@ -1,9 +1,10 @@
 import os
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QLabel, QSlider
+from PyQt5.QtWidgets import QLabel
 
 from utils.vtk_utils import *
+from widgets.Slider import Slider
 
 
 class SkinDisplayAction(object):
@@ -70,14 +71,8 @@ class SkinDisplayAction(object):
         label.setMinimumHeight(30)
         self.widgets.append(label)
 
-        slider = QSlider(Qt.Horizontal)
-        slider.setMinimum(0)
-        slider.setMaximum(800)
-        slider.setValue(400)
-        slider.setMinimumHeight(40)
-        slider.sliderReleased.connect(self.change_value)
-        self.slider = slider
-        self.widgets.append(slider)
+        self.slider = Slider(0, 800, 400, self.change_value)
+        self.widgets.append(self.slider)
 
     def init_skin_tools(self, reader):
         self.init_skin_extractor(reader)
@@ -240,7 +235,8 @@ class SkinDisplayAction(object):
         self.coronal.SetDisplayExtent(0, reader.GetHeight(), int(reader.GetHeight()/2), int(reader.GetHeight()/2), 0, self.image_amount)
         self.coronal.ForceOpaqueOn()
 
-    def change_value(self):
-        value = self.slider.value()
+    def change_value(self, value):
         self.skin_extractor.SetValue(0, value)
         self.skin_extractor.Update()
+        self.iren.GetRenderWindow().Render()
+

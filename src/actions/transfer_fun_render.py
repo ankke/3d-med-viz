@@ -1,9 +1,9 @@
 import vtk
-from PyQt5.QtWidgets import QSlider, QLabel
 from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QLabel
 
-from utils.vtk_utils import volume_mapper, piecewise_fun, volume_actor, read_dicom_images, window_renderer, \
-    get_renderer, add_style
+from utils.vtk_utils import volume_mapper, piecewise_fun, volume_actor, read_dicom_images, get_renderer, add_style
+from widgets.Slider import Slider
 
 
 class TransferFunAction(object):
@@ -45,18 +45,10 @@ class TransferFunAction(object):
         label.setMinimumHeight(30)
         self.widgets.append(label)
 
-        slider = QSlider(Qt.Horizontal)
-        slider.setMinimum(0)
-        slider.setMaximum(100)
-        slider.setValue(50)
-        slider.setMinimumHeight(40)
-        slider.sliderReleased.connect(self.change_transfer_fun)
-        self.slider = slider
-        self.widgets.append(slider)
+        self.slider = Slider(0, 100, 50, self.change_transfer_fun, scale=0.01)
+        self.widgets.append(self.slider)
 
-
-    def change_transfer_fun(self):
-        value = self.slider.value()
+    def change_transfer_fun(self, value):
         self.change_piecewise(value)
         self.iren.GetRenderWindow().Render()
 
@@ -66,4 +58,3 @@ class TransferFunAction(object):
         self.piecewise.AddPoint(self.point, value / 100)
         self.piecewise.AddPoint(self.point + 1, value / 100)
         self.piecewise.AddPoint(255, 0)
-

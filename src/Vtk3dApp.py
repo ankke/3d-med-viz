@@ -17,7 +17,7 @@ class MainWindow(QMainWindow):
         self.layout = QGridLayout()
         self.vtk_widgets = []
         self.toolBar = None
-        self.init_subwindows()
+        self.init_subwindows('../data/mr_brainixA')
 
     def init_subwindows(self, dir_path=None):
         self.vtk_widgets = [SubWindow(self, i + 1, path=dir_path) for i in range(4)]
