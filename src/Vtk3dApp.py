@@ -1,8 +1,8 @@
 import sys
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QMainWindow, QFrame, QApplication, QGridLayout, QToolBar, QPushButton, QFileDialog, QSlider, QCheckBox
-
+from PyQt5.QtWidgets import QMainWindow, QFrame, QGridLayout, QToolBar, QCheckBox, QPushButton, QFileDialog, \
+    QApplication
 from utils.vtk_utils import synchronize, unsynchronize
 from widgets.SubWindow import SubWindow
 
@@ -33,9 +33,11 @@ class MainWindow(QMainWindow):
         self.remove_tool_bar()
         tools = QToolBar()
         tools.setMinimumWidth(250)
+
         button = QPushButton("&Load other data")
         button.clicked.connect(self.open_file_dialog)
         tools.addWidget(button)
+
         checkbox = QCheckBox("Synchronize windows")
         checkbox.setMinimumHeight(40)
         checkbox.toggled.connect(self.on_checkbox_change(checkbox))
