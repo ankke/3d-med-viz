@@ -127,9 +127,9 @@ def start_render(inter):
     inter.Start()
 
 
-def synchronize(vtkWidget, irens):
+def synchronize(vtkWidget, vtk_widgets):
     vtkWidget.tag = vtkWidget.vtk_widget.AddObserver("InteractionEvent",
-                                                     lambda obj, event: sync_render(obj, event, irens))
+                                                     lambda obj, event: sync_render(obj, event, vtk_widgets))
 
 
 def unsynchronize(vtkWidget):
@@ -139,6 +139,6 @@ def unsynchronize(vtkWidget):
 def sync_render(obj, _event, irens):
     camera = obj.GetRenderWindow().GetRenderers().GetFirstRenderer().GetActiveCamera()
     for i in irens:
-        i.GetRenderWindow().GetRenderers().GetFirstRenderer().SetActiveCamera(camera)
+        i.action.renderer.SetActiveCamera(camera)
     for i in irens:
-        i.Render()
+        i.vtk_widget.Render()

@@ -79,13 +79,13 @@ class MainWindow(QMainWindow):
     def on_checkbox_change(self, checkbox):
         def callback(event):
             if checkbox.isChecked():
-                irens = []
+                vtk_widgets = []
                 for vtk_widget in self.vtk_widgets:
                     if vtk_widget.action is not None:
-                        irens.append(vtk_widget.vtk_widget)
-
+                        vtk_widgets.append(vtk_widget)
+                print(vtk_widgets)
                 for vtk_widget in self.vtk_widgets:
-                    synchronize(vtk_widget, irens)
+                    synchronize(vtk_widget, vtk_widgets)
             else:
                 for vtk_widget in self.vtk_widgets:
                     unsynchronize(vtk_widget)
