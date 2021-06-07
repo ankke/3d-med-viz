@@ -2,7 +2,8 @@ import vtk
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QLabel
 
-from utils.vtk_utils import read_dicom_images, add_style, get_renderer_with_multiple_actors
+from utils.vtk_utils import read_dicom_images, add_style, get_renderer_with_multiple_actors, named_colors, \
+    body_extractor, body_mapper, body_actor, outline_data, outline_mapper, outline_actor
 from widgets.Slider import Slider
 
 
@@ -11,18 +12,14 @@ class SkinCoverAction(object):
         reader, image_data = read_dicom_images(path)
 
         self.widgets = []
-        self.colors = vtk.vtkNamedColors()
+        self.colors = named_colors()
 
-        self.colors.SetColor('SkinColor', [240, 184, 160, 255])
-        self.colors.SetColor('BackfaceColor', [255, 229, 200, 255])
-        self.colors.SetColor('BkgColor', [51, 77, 102, 255])
-
-        self.init_skin_extractor(reader)
-        self.init_skin_mapper()
+        self.skin_extractor = body_extractor(reader, 500)
+        self.skin_mapper = body_mapper(self.skin_extractor)
         self.init_skin_actor()
-        self.init_outline_data(reader)
-        self.init_outline_map()
-        self.init_outline_actor()
+        self.outline_data = outline_data(reader)
+        self.outline_mapper = outline_mapper(self.outline_data)
+        self.outline_actor = outline_actor(self.outline_mapper, self.colors)
         actors = [self.outline_actor, self.skin_actor]
         self.renderer = get_renderer_with_multiple_actors(actors, background=(0.8, 0.8, 0.8))
 
@@ -48,41 +45,11 @@ class SkinCoverAction(object):
         self.slider = Slider(0, 1000, 500, self.change_value)
         self.widgets.append(self.slider)
 
-    def init_skin_extractor(self, reader):
-        try:
-            self.skin_extractor = vtk.vtkFlyingEdges3D()
-        except AttributeError:
-            self.skin_extractor = vtk.vtkMarchingCubes()
-
-        self.skin_extractor.SetInputConnection(reader.GetOutputPort())
-        self.skin_extractor.SetValue(0, 500)
-
-    def init_skin_mapper(self):
-        self.skin_mapper = vtk.vtkPolyDataMapper()
-        self.skin_mapper.SetInputConnection(self.skin_extractor.GetOutputPort())
-        self.skin_mapper.ScalarVisibilityOff()
-
-
     def init_skin_actor(self):
-        self.skin_actor = vtk.vtkActor()
-        self.skin_actor.SetMapper(self.skin_mapper)
-        self.skin_actor.GetProperty().SetDiffuseColor(self.colors.GetColor3d('SkinColor'))
+        self.skin_actor = body_actor(self.skin_mapper, self.colors, 'SkinColor')
         back_prop = vtk.vtkProperty()
         back_prop.SetDiffuseColor(self.colors.GetColor3d('BackfaceColor'))
         self.skin_actor.SetBackfaceProperty(back_prop)
-
-    def init_outline_data(self, reader):
-        self.outline_data = vtk.vtkOutlineFilter()
-        self.outline_data.SetInputConnection(reader.GetOutputPort())
-
-    def init_outline_map(self):
-        self.map_outline = vtk.vtkPolyDataMapper()
-        self.map_outline.SetInputConnection(self.outline_data.GetOutputPort())
-
-    def init_outline_actor(self):
-        self.outline_actor = vtk.vtkActor()
-        self.outline_actor.SetMapper(self.map_outline)
-        self.outline_actor.GetProperty().SetColor(self.colors.GetColor3d('Black'))
 
     def change_value(self, value):
         self.skin_extractor.SetValue(0, value)
