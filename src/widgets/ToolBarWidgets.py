@@ -1,9 +1,9 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QWidget, QLabel, QFrame
+from PyQt5.QtWidgets import QLabel, QFrame
 
 
-class ToolBarWidgets(QWidget):
+class ToolBarWidgets(object):
     def __init__(self, label_text, *args, **kwargs):
         super(ToolBarWidgets, self).__init__(*args, **kwargs)
         label = QLabel()
