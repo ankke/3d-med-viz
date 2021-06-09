@@ -3,6 +3,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QLabel
 
 from utils.vtk_utils import volume_mapper, piecewise_fun, volume_actor, read_dicom_images, get_renderer, add_style
+from widgets.HWidgets import HWidgets
 from widgets.Slider import Slider
 
 
@@ -46,9 +47,10 @@ class TransferFunMultAction(object):
         self.widgets.append(label)
 
         for i in range(len(self.points)):
-            input = Slider(0, 255, self.points[i][0], lambda val: self.input_change(i, val))
-            slider = Slider(0, 100, self.points[i][1] * 100, lambda val: self.change_transfer_fun(i, val), scale=0.01, input=input)
-            self.widgets.append(slider)
+            x_slider = Slider(0, 255, self.points[i][0], lambda val: self.input_change(i, val), label_text='x:')
+            y_slider = Slider(0, 100, self.points[i][1] * 100, lambda val: self.change_transfer_fun(i, val), scale=0.01, label_text='y:')
+            double_slider = HWidgets([x_slider, y_slider], label_text=f'{i + 1} point')
+            self.widgets.append(double_slider)
 
     def change_transfer_fun(self, i, value):
         self.change_piecewise(i, value)
