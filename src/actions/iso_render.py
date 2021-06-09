@@ -6,21 +6,21 @@ from widgets.Slider import Slider
 
 
 class IsoAction(object):
-    def __init__(self, path, measurement_on=False):
+    def __init__(self, path, iren, measurement_on=False):
+        self.iren = iren
         _, image_data = read_dicom_images(path)
 
         self.contour_filter = contour_filter(image_data, 150)
         actor = vtk_actor(poly_data_mapper(self.contour_filter))
 
         self.renderer = get_renderer(actor, background=(.8, .8, .8))
-        self.iren = None
         self.widgets = []
         self.slider = None
         self.meas_widget = None
         self.measurement_on = measurement_on
+        self.init_action()
 
-    def init_action(self, iren):
-        self.iren = iren
+    def init_action(self):
         add_style(self.iren)
         self.init_measurement()
         self.init_slider()

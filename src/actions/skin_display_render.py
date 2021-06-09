@@ -8,11 +8,12 @@ from widgets.Slider import Slider
 
 
 class SkinDisplayAction(object):
-    def __init__(self, path, measurement_on=False):
+    def __init__(self, path, iren, measurement_on=False):
+        self.iren = iren
+
         _, _, files = next(os.walk(path))
         self.image_amount = len(files)
         reader, image_data = read_dicom_images(path)
-        self.iren = None
         self.widgets = []
         self.slider = None
         self.label = None
@@ -52,10 +53,9 @@ class SkinDisplayAction(object):
         actors = [self.outline_actor, self.sagittal, self.axial, self.coronal, self.skin_actor, self.bone_actor]
         self.renderer = get_renderer_with_multiple_actors(actors, background=(0.8, 0.8, 0.8))
         self.measurement_on = measurement_on
+        self.init_action()
 
-
-    def init_action(self, iren):
-        self.iren = iren
+    def init_action(self):
         add_style(self.iren)
         self.init_measurement()
         self.init_slider()
@@ -131,14 +131,16 @@ class SkinDisplayAction(object):
 
     def init_colors(self, reader):
         self.sagittal_colors = image_actor_colors(reader, self.bw_lut)
-        self.sagittal = image_actor(self.sagittal_colors, int(reader.GetWidth()/2), int(reader.GetWidth()/2), 0, reader.GetHeight(), 0, self.image_amount)
+        self.sagittal = image_actor(self.sagittal_colors, int(reader.GetWidth() / 2), int(reader.GetWidth() / 2), 0,
+                                    reader.GetHeight(), 0, self.image_amount)
         self.axial_colors = image_actor_colors(reader, self.hue_lut)
-        self.axial = image_actor(self.axial_colors, 0, reader.GetWidth(), 0, reader.GetHeight(), int(self.image_amount/2), int(self.image_amount/2))
+        self.axial = image_actor(self.axial_colors, 0, reader.GetWidth(), 0, reader.GetHeight(),
+                                 int(self.image_amount / 2), int(self.image_amount / 2))
         self.coronal_colors = image_actor_colors(reader, self.sat_lut)
-        self.coronal = image_actor(self.coronal_colors, 0, reader.GetHeight(), int(reader.GetHeight()/2), int(reader.GetHeight()/2), 0, self.image_amount)
+        self.coronal = image_actor(self.coronal_colors, 0, reader.GetHeight(), int(reader.GetHeight() / 2),
+                                   int(reader.GetHeight() / 2), 0, self.image_amount)
 
     def change_value(self, value):
         self.skin_extractor.SetValue(0, value)
         self.skin_extractor.Update()
         self.iren.GetRenderWindow().Render()
-

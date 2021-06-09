@@ -17,7 +17,8 @@ class MainWindow(QMainWindow):
         self.layout = QGridLayout()
         self.subwindows = []
         self.toolBar = None
-        self.init_subwindows()
+        self.init_subwindows('../data/mr_brainixA')
+        self.statusbar = self.statusBar()
 
     def init_subwindows(self, dir_path=None):
         self.subwindows = [SubWindow(self, i + 1, path=dir_path) for i in range(4)]
@@ -52,11 +53,15 @@ class MainWindow(QMainWindow):
         return tools
 
     def open_file_dialog(self):
-        dir_path = QFileDialog.getExistingDirectory(self, 'Select Folder')
+        # try:
+        dir_path = QFileDialog.getExistingDirectory(self, 'Select directory')
         if dir_path != '':
             self.re_init_subwindows(dir_path)
         else:
             pass
+        # except:
+        #     self.statusbar.showMessage("Unable to open directory. Maybe it's not a DICOM series", 3000)
+
 
     def re_init_subwindows(self, dir_path):
         for subwindow in self.subwindows:

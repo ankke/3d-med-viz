@@ -69,10 +69,8 @@ class SubWindow(QWidget):
             index = self.combo.findText('')
             self.combo.removeItem(index)
 
-        self.action = actions.get(value)(measurement_on=self.checkbox.isChecked(), path=self.path)
+        self.action = actions.get(value)(self.path, self.iren, measurement_on=self.checkbox.isChecked())
         self.vtk_widget.GetRenderWindow().AddRenderer(self.action.renderer)
-        self.iren = self.vtk_widget.GetRenderWindow().GetInteractor()
-        self.action.init_action(self.iren)
         self.action.renderer.ResetCamera()
 
         self.refresh_tool_bar()
