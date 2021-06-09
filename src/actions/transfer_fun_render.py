@@ -1,8 +1,8 @@
-import vtk
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QLabel
 
-from utils.vtk_utils import volume_mapper, piecewise_fun, volume_actor, read_dicom_images, get_renderer, add_style
+from vtk_utils.transfer_fun import volume_mapper, piecewise_fun, volume_actor
+from vtk_utils.utils import read_dicom_images, get_renderer, add_style, init_measurement
 from widgets.Slider import Slider
 
 
@@ -28,16 +28,8 @@ class TransferFunAction(object):
 
     def init_action(self):
         add_style(self.iren)
-        self.init_measurement()
+        self.meas_widget = init_measurement(self.measurement_on, self.iren)
         self.init_slider()
-
-    def init_measurement(self):
-        self.meas_widget = vtk.vtkDistanceWidget()
-        self.meas_widget.SetInteractor(self.iren)
-        self.meas_widget.CreateDefaultRepresentation()
-        self.meas_widget.SetRepresentation(vtk.vtkDistanceRepresentation3D())
-        if self.measurement_on:
-            self.meas_widget.On()
 
     def init_slider(self):
         label = QLabel()

@@ -4,7 +4,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow, QFrame, QGridLayout, QToolBar, QCheckBox, QPushButton, QFileDialog, \
     QApplication
 
-from utils.vtk_utils import synchronize, unsynchronize
+from vtk_utils.sync import synchronize, unsynchronize
 from widgets.SubWindow import SubWindow
 
 

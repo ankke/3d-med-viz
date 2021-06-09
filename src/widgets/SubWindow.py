@@ -22,12 +22,12 @@ class SubWindow(QWidget):
         self.parent = parent
         self.path = path
 
-        label_text = f'Window {name}'
-        self.tool_bar = ToolBarWidgets(label_text)
+        subwindow_name = f'Window {name}'
+        self.tool_bar = ToolBarWidgets(subwindow_name)
 
         label = QLabel()
         label.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
-        label.setText(label_text)
+        label.setText(subwindow_name)
 
         combo = QComboBox()
         combo.addItem('')
@@ -56,18 +56,15 @@ class SubWindow(QWidget):
         self.setLayout(layout)
 
         self.action = None
-        self.iren = self.vtk_widget.GetRenderWindow().GetInteractor()
-
         self.tag = None
+
+        self.iren = self.vtk_widget.GetRenderWindow().GetInteractor()
         self.iren.Initialize()
 
     def on_combobox_change(self, value):
-        if value is '':
-            self.checkbox.setCheckable(False)
-        else:
-            self.checkbox.setCheckable(True)
-            index = self.combo.findText('')
-            self.combo.removeItem(index)
+        self.checkbox.setCheckable(True)
+        index = self.combo.findText('')
+        self.combo.removeItem(index)
 
         self.action = actions.get(value)(self.path, self.iren, measurement_on=self.checkbox.isChecked())
         self.vtk_widget.GetRenderWindow().AddRenderer(self.action.renderer)

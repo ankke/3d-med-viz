@@ -1,9 +1,12 @@
 import os
 
+import vtk
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QLabel
 
-from utils.vtk_utils import *
+from vtk_utils.skin import body_extractor, body_stripper, body_mapper, body_actor, outline_data, outline_mapper, \
+    outline_actor, image_actor_colors, image_actor, named_colors, get_renderer_with_multiple_actors
+from vtk_utils.utils import read_dicom_images, add_style, init_measurement
 from widgets.Slider import Slider
 
 
@@ -57,7 +60,7 @@ class SkinDisplayAction(object):
 
     def init_action(self):
         add_style(self.iren)
-        self.init_measurement()
+        self.meas_widget = init_measurement(self.measurement_on, self.iren)
         self.init_slider()
 
     def init_measurement(self):
