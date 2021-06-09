@@ -6,7 +6,7 @@ from widgets.Slider import Slider
 
 
 class IsoAction(object):
-    def __init__(self, measurement_on=False, path='../data/mr_brainixA'):
+    def __init__(self, path, measurement_on=False):
         _, image_data = read_dicom_images(path)
 
         self.contour_filter = contour_filter(image_data, 150)

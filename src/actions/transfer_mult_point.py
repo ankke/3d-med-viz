@@ -9,7 +9,7 @@ from widgets.Slider import Slider
 
 class TransferFunMultAction(object):
 
-    def __init__(self, measurement_on=False, path='../data/mr_brainixA'):
+    def __init__(self, path, measurement_on=False):
         reader, image_data = read_dicom_images(path)
 
         self.points = [(100, 0.5), (180, 1), (200, 0.5)]

@@ -8,7 +8,7 @@ from widgets.Slider import Slider
 
 
 class SkinDisplayAction(object):
-    def __init__(self, measurement_on=False, path='../data/mr_brainixA'):
+    def __init__(self, path, measurement_on=False):
         _, _, files = next(os.walk(path))
         self.image_amount = len(files)
         reader, image_data = read_dicom_images(path)
