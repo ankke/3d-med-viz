@@ -6,15 +6,15 @@ from utils.vtk_utils import volume_mapper, piecewise_fun, volume_actor, read_dic
 from widgets.Slider import Slider
 
 
-class TransferFunAction(object):
+class TransferFunMultAction(object):
 
     def __init__(self, measurement_on=False, path='../data/mr_brainixA'):
         reader, image_data = read_dicom_images(path)
 
-        self.point = 180
+        self.points = [(100, 0.5), (180, 1), (200, 0.5)]
 
         self.mapper = volume_mapper(reader)
-        self.piecewise = piecewise_fun(((0, 0), (self.point, 1), (self.point + 1, 1), (255, 0)))
+        self.piecewise = piecewise_fun(((0, 0), *self.points, (255, 0)))
         self.actor = volume_actor(self.mapper, self.piecewise)
 
         self.renderer = get_renderer(self.actor, background=(0.8, 0.8, 0.8))
@@ -45,16 +45,27 @@ class TransferFunAction(object):
         label.setMinimumHeight(30)
         self.widgets.append(label)
 
-        self.slider = Slider(0, 100, 50, self.change_transfer_fun, scale=0.01)
-        self.widgets.append(self.slider)
+        for i in range(len(self.points)):
+            input = Slider(0, 255, self.points[i][0], lambda val: self.input_change(i, val))
+            slider = Slider(0, 100, self.points[i][1] * 100, lambda val: self.change_transfer_fun(i, val), scale=0.01, input=input)
+            self.widgets.append(slider)
 
-    def change_transfer_fun(self, value):
-        self.change_piecewise(value)
-        self.iren.GetRenderWindow().Render()
+    def change_transfer_fun(self, i, value):
+        self.change_piecewise(i, value)
 
-    def change_piecewise(self, value):
+    def change_piecewise(self, i, value):
+        self.points[i] = (self.points[i][0], float(value))
+        self.update()
+
+    def input_change(self, i, value):
+        self.points[i] = (float(value), self.points[i][1])
+        self.update()
+
+    def update(self):
         self.piecewise.RemoveAllPoints()
         self.piecewise.AddPoint(0, 0)
-        self.piecewise.AddPoint(self.point, value / 100)
-        self.piecewise.AddPoint(self.point + 1, value / 100)
+        for point, val in self.points:
+            self.piecewise.AddPoint(point, val / 100)
+            self.piecewise.AddPoint(point + 1, val / 100)
         self.piecewise.AddPoint(255, 0)
+        self.iren.GetRenderWindow().Render()

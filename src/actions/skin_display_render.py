@@ -1,9 +1,10 @@
 import os
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QLabel, QSlider
+from PyQt5.QtWidgets import QLabel
 
 from utils.vtk_utils import *
+from widgets.Slider import Slider
 
 
 class SkinDisplayAction(object):
@@ -26,7 +27,7 @@ class SkinDisplayAction(object):
         self.bone_mapper = None
         self.bone_actor = None
         self.outline_data = None
-        self.map_outline = None
+        self.outline_mapper = None
         self.outline_actor = None
         self.bw_lut = None
         self.hue_lut = None
@@ -38,7 +39,7 @@ class SkinDisplayAction(object):
         self.coronal_colors = None
         self.coronal = None
 
-        self.init_named_colors()
+        self.colors = named_colors()
         self.init_skin_tools(reader)
         self.init_bone_tools(reader)
         self.init_outline_tools(reader)
@@ -70,100 +71,30 @@ class SkinDisplayAction(object):
         label.setMinimumHeight(30)
         self.widgets.append(label)
 
-        slider = QSlider(Qt.Horizontal)
-        slider.setMinimum(0)
-        slider.setMaximum(800)
-        slider.setValue(400)
-        slider.setMinimumHeight(40)
-        slider.sliderReleased.connect(self.change_value)
-        self.slider = slider
-        self.widgets.append(slider)
+        self.slider = Slider(0, 1000, 500, self.change_value)
+        self.widgets.append(self.slider)
 
     def init_skin_tools(self, reader):
-        self.init_skin_extractor(reader)
-        self.init_skin_stripper()
-        self.init_skin_mapper()
+        self.skin_extractor = body_extractor(reader, 500)
+        self.skin_stripper = body_stripper(self.skin_extractor)
+        self.skin_mapper = body_mapper(self.skin_stripper)
         self.init_skin_actor()
 
-    def init_named_colors(self):
-        self.colors = vtk.vtkNamedColors()
-        self.colors.SetColor('SkinColor', [240, 184, 160, 255])
-        self.colors.SetColor('BkgColor', [51, 77, 102, 255])
-
-    def init_skin_extractor(self, reader):
-        try:
-            self.skin_extractor = vtk.vtkFlyingEdges3D()
-        except AttributeError:
-            self.skin_extractor = vtk.vtkMarchingCubes()
-
-        self.skin_extractor.SetInputConnection(reader.GetOutputPort())
-        self.skin_extractor.SetValue(0, 1000)
-        self.skin_extractor.Update()
-
-    def init_skin_stripper(self):
-        self.skin_stripper = vtk.vtkStripper()
-        self.skin_stripper.SetInputConnection(self.skin_extractor.GetOutputPort())
-        self.skin_stripper.Update()
-
-    def init_skin_mapper(self):
-        self.skin_mapper = vtk.vtkPolyDataMapper()
-        self.skin_mapper.SetInputConnection(self.skin_stripper.GetOutputPort())
-        self.skin_mapper.ScalarVisibilityOff()
-
     def init_skin_actor(self):
-        self.skin_actor = vtk.vtkActor()
-        self.skin_actor.SetMapper(self.skin_mapper)
-        self.skin_actor.GetProperty().SetDiffuseColor(self.colors.GetColor3d('SkinColor'))
+        self.skin_actor = body_actor(self.skin_mapper, self.colors, 'SkinColor')
         self.skin_actor.GetProperty().SetSpecular(0.3)
         self.skin_actor.GetProperty().SetSpecularPower(20)
 
     def init_bone_tools(self, reader):
-        self.init_bone_extractor(reader)
-        self.init_bone_stripper()
-        self.init_bone_mapper()
-        self.init_bone_actor()
-
-    def init_bone_extractor(self, reader):
-        try:
-            self.bone_extractor = vtk.vtkFlyingEdges3D()
-        except AttributeError:
-            self.bone_extractor = vtk.vtkMarchingCubes()
-
-        self.bone_extractor.SetInputConnection(reader.GetOutputPort())
-        self.bone_extractor.SetValue(0, 1150)
-
-    def init_bone_stripper(self):
-        self.bone_stripper = vtk.vtkStripper()
-        self.bone_stripper.SetInputConnection(self.bone_extractor.GetOutputPort())
-
-    def init_bone_mapper(self):
-        self.bone_mapper = vtk.vtkPolyDataMapper()
-        self.bone_mapper.SetInputConnection(self.bone_stripper.GetOutputPort())
-        self.bone_mapper.ScalarVisibilityOff()
-
-    def init_bone_actor(self):
-        self.bone_actor = vtk.vtkActor()
-        self.bone_actor.SetMapper(self.bone_mapper)
-        self.bone_actor.GetProperty().SetDiffuseColor(self.colors.GetColor3d('Ivory'))
+        self.bone_extractor = body_extractor(reader, 1150)
+        self.bone_stripper = body_stripper(self.bone_extractor)
+        self.bone_mapper = body_mapper(self.bone_stripper)
+        self.bone_actor = body_actor(self.bone_mapper, self.colors, 'Ivory')
 
     def init_outline_tools(self, reader):
-        self.init_outline_data(reader)
-        self.init_outline_map()
-        self.init_outline_actor()
-
-    def init_outline_data(self, reader):
-        self.outline_data = vtk.vtkOutlineFilter()
-        self.outline_data.SetInputConnection(reader.GetOutputPort())
-        self.outline_data.Update()
-
-    def init_outline_map(self):
-        self.map_outline = vtk.vtkPolyDataMapper()
-        self.map_outline.SetInputConnection(self.outline_data.GetOutputPort())
-
-    def init_outline_actor(self):
-        self.outline_actor = vtk.vtkActor()
-        self.outline_actor.SetMapper(self.map_outline)
-        self.outline_actor.GetProperty().SetColor(self.colors.GetColor3d('Black'))
+        self.outline_data = outline_data(reader)
+        self.outline_mapper = outline_mapper(self.outline_data)
+        self.outline_actor = outline_actor(self.outline_mapper, self.colors)
 
     def init_lookup_table(self):
         self.init_bw_lookup_table()
@@ -195,52 +126,15 @@ class SkinDisplayAction(object):
         self.sat_lut.Build()
 
     def init_colors(self, reader):
-        self.init_sagittal_colors(reader)
-        self.init_sagittal(reader)
-        self.init_axial_colors(reader)
-        self.init_axial(reader)
-        self.init_coronal_colors(reader)
-        self.init_coronal(reader)
+        self.sagittal_colors = image_actor_colors(reader, self.bw_lut)
+        self.sagittal = image_actor(self.sagittal_colors, int(reader.GetWidth()/2), int(reader.GetWidth()/2), 0, reader.GetHeight(), 0, self.image_amount)
+        self.axial_colors = image_actor_colors(reader, self.hue_lut)
+        self.axial = image_actor(self.axial_colors, 0, reader.GetWidth(), 0, reader.GetHeight(), int(self.image_amount/2), int(self.image_amount/2))
+        self.coronal_colors = image_actor_colors(reader, self.sat_lut)
+        self.coronal = image_actor(self.coronal_colors, 0, reader.GetHeight(), int(reader.GetHeight()/2), int(reader.GetHeight()/2), 0, self.image_amount)
 
-    def init_sagittal_colors(self, reader):
-        self.sagittal_colors = vtk.vtkImageMapToColors()
-        self.sagittal_colors.SetInputConnection(reader.GetOutputPort())
-        self.sagittal_colors.SetLookupTable(self.bw_lut)
-        self.sagittal_colors.Update()
-
-    #Sagittal, mają być w połowie szerokości - empirycznie testowane
-    def init_sagittal(self, reader):
-        self.sagittal = vtk.vtkImageActor()
-        self.sagittal.GetMapper().SetInputConnection(self.sagittal_colors.GetOutputPort())
-        self.sagittal.SetDisplayExtent(int(reader.GetWidth()/2), int(reader.GetWidth()/2), 0, reader.GetHeight(), 0, self.image_amount)
-        self.sagittal.ForceOpaqueOn()
-
-    def init_axial_colors(self, reader):
-        self.axial_colors = vtk.vtkImageMapToColors()
-        self.axial_colors.SetInputConnection(reader.GetOutputPort())
-        self.axial_colors.SetLookupTable(self.hue_lut)
-        self.axial_colors.Update()
-
-    def init_axial(self, reader):
-        self.axial = vtk.vtkImageActor()
-        self.axial.GetMapper().SetInputConnection(self.axial_colors.GetOutputPort())
-        self.axial.SetDisplayExtent(0, reader.GetWidth(), 0, reader.GetHeight(), int(self.image_amount/2), int(self.image_amount/2))
-        self.axial.ForceOpaqueOn()
-
-    def init_coronal_colors(self, reader):
-        self.coronal_colors = vtk.vtkImageMapToColors()
-        self.coronal_colors.SetInputConnection(reader.GetOutputPort())
-        self.coronal_colors.SetLookupTable(self.sat_lut)
-        self.coronal_colors.Update()
-
-    #Coronal to białe, mają być w połowie wysokości - empirycznie testowane
-    def init_coronal(self, reader):
-        self.coronal = vtk.vtkImageActor()
-        self.coronal.GetMapper().SetInputConnection(self.coronal_colors.GetOutputPort())
-        self.coronal.SetDisplayExtent(0, reader.GetHeight(), int(reader.GetHeight()/2), int(reader.GetHeight()/2), 0, self.image_amount)
-        self.coronal.ForceOpaqueOn()
-
-    def change_value(self):
-        value = self.slider.value()
+    def change_value(self, value):
         self.skin_extractor.SetValue(0, value)
         self.skin_extractor.Update()
+        self.iren.GetRenderWindow().Render()
+
