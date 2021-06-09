@@ -66,6 +66,8 @@ class SubWindow(QWidget):
             self.checkbox.setCheckable(False)
         else:
             self.checkbox.setCheckable(True)
+            index = self.combo.findText('')
+            self.combo.removeItem(index)
 
         self.action = actions.get(value)(measurement_on=self.checkbox.isChecked(), path=self.path)
         self.vtk_widget.GetRenderWindow().AddRenderer(self.action.renderer)
