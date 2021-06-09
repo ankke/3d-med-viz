@@ -22,6 +22,8 @@ class SkinCoverAction(object):
         self.outline_actor = outline_actor(self.outline_mapper, self.colors)
         actors = [self.outline_actor, self.skin_actor]
         self.renderer = get_renderer_with_multiple_actors(actors, background=(0.8, 0.8, 0.8))
+        self.measurement_on = measurement_on
+
 
     def init_action(self, iren):
         self.iren = iren
@@ -34,6 +36,8 @@ class SkinCoverAction(object):
         self.meas_widget.SetInteractor(self.iren)
         self.meas_widget.CreateDefaultRepresentation()
         self.meas_widget.SetRepresentation(vtk.vtkDistanceRepresentation3D())
+        if self.measurement_on:
+            self.meas_widget.On()
 
     def init_slider(self):
         label = QLabel()
