@@ -7,7 +7,7 @@ from actions.skin_cover_render import SkinCoverAction
 from actions.transfer_fun_render import TransferFunAction
 from actions.skin_display_render import SkinDisplayAction
 from actions.transfer_mult_point import TransferFunMultAction
-from widgets.ToolBar import ToolBar
+from widgets.ToolBarWidgets import ToolBarWidgets
 
 actions = {'iso': IsoAction,
            'transfer': TransferFunMultAction,
@@ -23,7 +23,7 @@ class SubWindow(QWidget):
         self.path = path
 
         label_text = f'Window {name}'
-        self.tool_bar = ToolBar(label_text)
+        self.tool_bar = ToolBarWidgets(label_text)
 
         label = QLabel()
         label.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
@@ -35,7 +35,7 @@ class SubWindow(QWidget):
             combo.setEnabled(False)
         for name in actions.keys():
             combo.addItem(name)
-        combo.currentTextChanged.connect(self.on_combobox_changed)
+        combo.currentTextChanged.connect(self.on_combobox_change)
         self.combo = combo
 
         checkbox = QCheckBox("measure")
@@ -61,7 +61,7 @@ class SubWindow(QWidget):
         self.tag = None
         self.iren.Initialize()
 
-    def on_combobox_changed(self, value):
+    def on_combobox_change(self, value):
         if value is '':
             self.checkbox.setCheckable(False)
         else:

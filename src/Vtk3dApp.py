@@ -15,14 +15,14 @@ class MainWindow(QMainWindow):
 
         self.frame = QFrame()
         self.layout = QGridLayout()
-        self.vtk_widgets = []
+        self.subwindows = []
         self.toolBar = None
-        self.init_subwindows('../data/mr_brainixA')
+        self.init_subwindows()
 
     def init_subwindows(self, dir_path=None):
-        self.vtk_widgets = [SubWindow(self, i + 1, path=dir_path) for i in range(4)]
+        self.subwindows = [SubWindow(self, i + 1, path=dir_path) for i in range(4)]
         positions = [(i, j) for i in range(2) for j in range(2)]
-        for position, widget in zip(positions, self.vtk_widgets):
+        for position, widget in zip(positions, self.subwindows):
             self.layout.addWidget(widget, *position)
         self.frame.setLayout(self.layout)
         self.toolBar = self.create_tool_bar()
@@ -45,8 +45,8 @@ class MainWindow(QMainWindow):
         checkbox.toggled.connect(self.on_checkbox_change(checkbox))
         tools.addWidget(checkbox)
 
-        for vtk_widget in self.vtk_widgets:
-            for widget in vtk_widget.tool_bar.widgets:
+        for subwindow in self.subwindows:
+            for widget in subwindow.tool_bar.widgets:
                 tools.addWidget(widget)
 
         return tools
@@ -59,16 +59,16 @@ class MainWindow(QMainWindow):
             pass
 
     def re_init_subwindows(self, dir_path):
-        for window in self.vtk_widgets:
-            window.close()
+        for subwindow in self.subwindows:
+            subwindow.close()
         self.init_subwindows(dir_path)
 
     def refresh_tool_bar(self):
         self.remove_tool_bar()
         self.toolBar = self.create_tool_bar()
         self.addToolBar(Qt.LeftToolBarArea, self.toolBar)
-        for vtk_widget in self.vtk_widgets:
-            unsynchronize(vtk_widget)
+        for subwindow in self.subwindows:
+            unsynchronize(subwindow)
 
     def remove_tool_bar(self):
         try:
@@ -77,18 +77,18 @@ class MainWindow(QMainWindow):
             pass
 
     def on_checkbox_change(self, checkbox):
-        def callback(event):
+        def callback(_event):
             if checkbox.isChecked():
                 vtk_widgets = []
-                for vtk_widget in self.vtk_widgets:
-                    if vtk_widget.action is not None:
-                        vtk_widgets.append(vtk_widget)
+                for subwindow in self.subwindows:
+                    if subwindow.action is not None:
+                        vtk_widgets.append(subwindow)
                 print(vtk_widgets)
-                for vtk_widget in self.vtk_widgets:
-                    synchronize(vtk_widget, vtk_widgets)
+                for subwindow in self.subwindows:
+                    synchronize(subwindow, vtk_widgets)
             else:
-                for vtk_widget in self.vtk_widgets:
-                    unsynchronize(vtk_widget)
+                for subwindow in self.subwindows:
+                    unsynchronize(subwindow)
 
         return callback
 

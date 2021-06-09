@@ -3,9 +3,9 @@ from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QWidget, QLabel, QFrame
 
 
-class ToolBar(QWidget):
+class ToolBarWidgets(QWidget):
     def __init__(self, label_text, *args, **kwargs):
-        super(ToolBar, self).__init__(*args, **kwargs)
+        super(ToolBarWidgets, self).__init__(*args, **kwargs)
         label = QLabel()
         label.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
         label.setText(label_text)
