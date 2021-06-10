@@ -13,6 +13,7 @@ class LeftToolbar(QToolBar):
         self.scroll_widget = QWidget(self)
         self.scroll_layout = QVBoxLayout()
         self.scroll_widget.setLayout(self.scroll_layout)
+        self.scroll_widget.setMinimumWidth(350)
 
         button = QPushButton("&Load data")
         button.clicked.connect(open_file_dialog)
@@ -21,6 +22,7 @@ class LeftToolbar(QToolBar):
         label = QLabel()
         label.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
         label.setText('Windows number:')
+
         combo = QComboBox()
         combo.addItem('1')
         for num in range(2, 10, 2):
@@ -29,14 +31,14 @@ class LeftToolbar(QToolBar):
         combo.setCurrentIndex(index)
         combo.currentTextChanged.connect(on_combobox_change)
         combo.setMaximumWidth(70)
-        wid = HWidgets([label, combo])
-        self.scroll_layout.addWidget(wid)
 
         checkbox = QCheckBox("Synchronize windows")
         checkbox.setMinimumHeight(30)
         checkbox.setStyleSheet("margin-left:50%; margin-right:50%;")
         checkbox.toggled.connect(on_checkbox_change(checkbox))
-        self.scroll_layout.addWidget(checkbox)
+
+        wid = HWidgets([label, combo, checkbox])
+        self.scroll_layout.addWidget(wid)
 
         for subwindow in subwindows:
             for widget in subwindow.tool_bar.widgets:
