@@ -1,14 +1,16 @@
-import vtk
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QLabel
 
-from utils.vtk_utils import volume_mapper, piecewise_fun, volume_actor, read_dicom_images, get_renderer, add_style
+from vtk_utils.transfer_fun import volume_mapper, piecewise_fun, volume_actor
+from vtk_utils.utils import read_dicom_images, get_renderer, add_style, init_measurement
 from widgets.Slider import Slider
 
 
 class TransferFunAction(object):
 
-    def __init__(self, measurement_on=False, path='../data/mr_brainixA'):
+    def __init__(self, path, iren, measurement_on=False):
+        self.iren = iren
+
         reader, image_data = read_dicom_images(path)
 
         self.point = 180
@@ -18,25 +20,16 @@ class TransferFunAction(object):
         self.actor = volume_actor(self.mapper, self.piecewise)
 
         self.renderer = get_renderer(self.actor, background=(0.8, 0.8, 0.8))
-        self.iren = None
         self.slider = None
         self.widgets = []
         self.meas_widget = None
         self.measurement_on = measurement_on
+        self.init_action()
 
-    def init_action(self, iren):
-        self.iren = iren
+    def init_action(self):
         add_style(self.iren)
-        self.init_measurement()
+        self.meas_widget = init_measurement(self.measurement_on, self.iren)
         self.init_slider()
-
-    def init_measurement(self):
-        self.meas_widget = vtk.vtkDistanceWidget()
-        self.meas_widget.SetInteractor(self.iren)
-        self.meas_widget.CreateDefaultRepresentation()
-        self.meas_widget.SetRepresentation(vtk.vtkDistanceRepresentation3D())
-        if self.measurement_on:
-            self.meas_widget.On()
 
     def init_slider(self):
         label = QLabel()
