@@ -18,7 +18,7 @@ class MainWindow(QMainWindow):
         self.subwindows = []
         self.toolBar = None
         self.windows_num = 4
-        self.dir_path = '../data/mr_brainixA1'  # for dev
+        self.dir_path = None
         self.init_subwindows()
         self.create_tool_bar()
         self.statusbar = self.statusBar()
@@ -40,15 +40,12 @@ class MainWindow(QMainWindow):
         self.addToolBar(Qt.LeftToolBarArea, self.toolBar)
 
     def open_file_dialog(self):
-        # try:
         dir_path = QFileDialog.getExistingDirectory(self, 'Select directory')
         if dir_path != '':
             self.dir_path = dir_path
             self.re_init_subwindows()
         else:
             pass
-        # except:
-        #     self.statusbar.showMessage("Unable to open directory. Maybe it's not a DICOM series", 3000)
 
     def re_init_subwindows(self):
         for subwindow in self.subwindows:
