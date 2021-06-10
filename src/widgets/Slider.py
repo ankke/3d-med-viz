@@ -1,10 +1,10 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QSlider, QLabel
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, QSlider, QLabel, QVBoxLayout
 
 
 class Slider(QWidget):
 
-    def __init__(self, min, max, init, callback, scale=1.0, input=None):
+    def __init__(self, min, max, init, callback, label_text=None, scale=1.0, spacing=5):
         super().__init__()
         self.scale = scale
         slider = QSlider(Qt.Horizontal, self)
@@ -16,20 +16,21 @@ class Slider(QWidget):
 
         self.slider = slider
 
-        label = QLabel("{:.2f}".format(init * self.scale), self)
-        label.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
-        label.setMinimumWidth(50)
-        self.label = label
+        value_label = QLabel("{:.2f}".format(init * self.scale), self)
+        value_label.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+        value_label.setMinimumWidth(50)
+        self.value_label = value_label
 
         hbox = QHBoxLayout()
-        if input is not None:
-            hbox.addWidget(input)
-            hbox.addSpacing(10)
+        if label_text is not None:
+            label = QLabel(f'{label_text}', self)
+            hbox.addWidget(label)
+            hbox.addSpacing(spacing)
         hbox.addWidget(self.slider)
-        hbox.addSpacing(15)
-        hbox.addWidget(self.label)
+        hbox.addSpacing(spacing)
+        hbox.addWidget(self.value_label)
 
         self.setLayout(hbox)
 
     def updateLabel(self, value):
-        self.label.setText("{:.2f}".format(value * self.scale))
+        self.value_label.setText("{:.2f}".format(value * self.scale))

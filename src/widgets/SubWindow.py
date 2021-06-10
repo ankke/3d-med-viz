@@ -7,7 +7,7 @@ from actions.skin_cover_render import SkinCoverAction
 from actions.transfer_fun_render import TransferFunAction
 from actions.skin_display_render import SkinDisplayAction
 from actions.transfer_mult_point import TransferFunMultAction
-from widgets.ToolBar import ToolBar
+from widgets.ToolBarWidgets import ToolBarWidgets
 
 actions = {'iso': IsoAction,
            'transfer': TransferFunMultAction,
@@ -22,12 +22,12 @@ class SubWindow(QWidget):
         self.parent = parent
         self.path = path
 
-        label_text = f'Window {name}'
-        self.tool_bar = ToolBar(label_text)
+        subwindow_name = f'Window {name}'
+        self.tool_bar = ToolBarWidgets(subwindow_name)
 
         label = QLabel()
         label.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
-        label.setText(label_text)
+        label.setText(subwindow_name)
 
         combo = QComboBox()
         combo.addItem('')
@@ -35,7 +35,7 @@ class SubWindow(QWidget):
             combo.setEnabled(False)
         for name in actions.keys():
             combo.addItem(name)
-        combo.currentTextChanged.connect(self.on_combobox_changed)
+        combo.currentTextChanged.connect(self.on_combobox_change)
         self.combo = combo
 
         checkbox = QCheckBox("measure")
@@ -56,21 +56,18 @@ class SubWindow(QWidget):
         self.setLayout(layout)
 
         self.action = None
-        self.iren = self.vtk_widget.GetRenderWindow().GetInteractor()
-
         self.tag = None
+
+        self.iren = self.vtk_widget.GetRenderWindow().GetInteractor()
         self.iren.Initialize()
 
-    def on_combobox_changed(self, value):
-        if value is '':
-            self.checkbox.setCheckable(False)
-        else:
-            self.checkbox.setCheckable(True)
+    def on_combobox_change(self, value):
+        self.checkbox.setCheckable(True)
+        index = self.combo.findText('')
+        self.combo.removeItem(index)
 
-        self.action = actions.get(value)(measurement_on=self.checkbox.isChecked(), path=self.path)
+        self.action = actions.get(value)(self.path, self.iren, measurement_on=self.checkbox.isChecked())
         self.vtk_widget.GetRenderWindow().AddRenderer(self.action.renderer)
-        self.iren = self.vtk_widget.GetRenderWindow().GetInteractor()
-        self.action.init_action(self.iren)
         self.action.renderer.ResetCamera()
 
         self.refresh_tool_bar()
