@@ -14,6 +14,6 @@ Run Vtk3dApp.
 ![Main window](https://github.com/ankke/3d-med-viz/blob/master/images/main_window.png)
 
 ## app documentation
-Available here: [Documentation][Documentation]
+Available in polish: [Documentation][Documentation]
 
 [Documentation]: https://github.com/ankke/3d-med-viz/blob/master/Documentation.pdf
