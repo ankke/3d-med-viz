@@ -11,6 +11,8 @@ Install Python and dependencies from requirements.txt.
  
 Run Vtk3dApp.
 
+![Main window](https://github.com/ankke/3d-med-viz/blob/master/images/main_window.png)
+
 ## app documentation
 Available here: [Documentation][Documentation]
 
